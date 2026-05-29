@@ -1,0 +1,13 @@
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Data & Models
+loan_approval_assets.pkl
+.ipynb_checkpoints/
+
+# Virtual Environments
+venv/
+.venv/
+env/
