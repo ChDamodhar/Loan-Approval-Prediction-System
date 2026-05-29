@@ -4,6 +4,8 @@ import numpy as np
 import joblib
 import matplotlib.pyplot as plt
 import seaborn as sns
+import os
+import urllib.request
 
 # Set clean, enterprise-grade page configuration
 st.set_page_config(page_title="Loan Intelligence Portal", layout="wide", page_icon="🏦")
@@ -21,12 +23,24 @@ st.markdown("""
 """, unsafe_allow_html=True)
 
 # ==========================================
-# 1. LOAD & CACHE DATA ASSETS
+# 1. LOAD & CACHE DATA ASSETS WITH DOWNLOADER
 # ==========================================
 @st.cache_resource
 def load_banking_assets():
-    return joblib.load('loan_approval_assets.pkl')
+    pkl_filename = 'loan_approval_assets.pkl'
+    
+    # If the file isn't in the cloud container, download it on the fly
+    if not os.path.exists(pkl_filename):
+        with st.spinner("📥 Downloading trained model assets from cloud storage... Please wait."):
+            # ⚠️ REPLACE THIS URL WITH YOUR ACTUAL DIRECT DOWNLOAD LINK
+            direct_download_url = "https://your-cloud-storage-link/loan_approval_assets.pkl" 
+            
+            urllib.request.urlretrieve(direct_download_url, pkl_filename)
+            st.success("✅ Download complete!")
+            
+    return joblib.load(pkl_filename)
 
+# Unpack all required artifacts
 assets = load_banking_assets()
 log_reg = assets['logistic_regression']
 rf_model = assets['random_forest']
@@ -49,7 +63,6 @@ st.markdown("---")
 # ==========================================
 st.sidebar.header("📋 Applicant Financial Profile")
 
-# Layout parameters partitioned by logic
 with st.sidebar.expander("💳 Demographics & Core Credit", expanded=True):
     age = st.number_input("Age", min_value=18, max_value=100, value=34)
     credit_score = st.slider("Credit Score", 300, 850, 710)
@@ -134,7 +147,7 @@ with tab1:
         if rf_risk_prob < 0.25:
             st.info("🟢 **Tier status: Low Risk Profile**")
         elif rf_risk_prob < 0.55:
-            st.warning("🟡 **Tier status: Borderline Profile (Requires Co-signer validation)**")
+            st.warning("🟡 **Tier status: Borderline Profile (Requires Manual Review)**")
         else:
             st.error("🔴 **Tier status: Critically High Risk Exposure**")
         st.markdown("</div>", unsafe_allow_html=True)
@@ -144,7 +157,7 @@ with tab1:
 # ------------------------------------------
 with tab2:
     st.subheader("Interactive Behavioral Segmentation Map")
-    st.write(f"Based on macro-financial attributes, this applicant maps to **Cluster Segment {assigned_cluster}**.")
+    st.write(f"Based on macro-financial attributes, this applicant maps to **Customer Segment {assigned_cluster}**.")
 
     col1, col2 = st.columns([3, 2])
     
