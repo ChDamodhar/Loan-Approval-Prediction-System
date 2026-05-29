@@ -4,8 +4,7 @@ import numpy as np
 import joblib
 import matplotlib.pyplot as plt
 import seaborn as sns
-import os
-import urllib.request
+
 
 # Set clean, enterprise-grade page configuration
 st.set_page_config(page_title="Loan Intelligence Portal", layout="wide", page_icon="🏦")
@@ -23,22 +22,11 @@ st.markdown("""
 """, unsafe_allow_html=True)
 
 # ==========================================
-# 1. LOAD & CACHE DATA ASSETS WITH DOWNLOADER
+# 1. LOAD & CACHE DATA ASSETS
 # ==========================================
 @st.cache_resource
 def load_banking_assets():
-    pkl_filename = 'loan_approval_assets.pkl'
-    
-    # If the file isn't in the cloud container, download it on the fly
-    if not os.path.exists(pkl_filename):
-        with st.spinner("📥 Downloading trained model assets from cloud storage... Please wait."):
-            # ⚠️ REPLACE THIS URL WITH YOUR ACTUAL DIRECT DOWNLOAD LINK
-            direct_download_url = "https://your-cloud-storage-link/loan_approval_assets.pkl" 
-            
-            urllib.request.urlretrieve(direct_download_url, pkl_filename)
-            st.success("✅ Download complete!")
-            
-    return joblib.load(pkl_filename)
+    return joblib.load('loan_approval_assets.pkl')
 
 # Unpack all required artifacts
 assets = load_banking_assets()
